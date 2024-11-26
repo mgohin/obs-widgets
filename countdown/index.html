@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>It's the final countdown</title>
+    <script type="module" src="components/countdown.component.js"></script>
+    <script type="module" src="components/countdown-unit.component.js"></script>
+
+</head>
+<body>
+
+<script type="text/javascript">
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const date = searchParams.get('date') ?? null;
+    const show = searchParams.get('show') ?? 'hours,secondes       minutes;days';
+    const textColor = searchParams.get('text-color') ?? '#000';
+
+    const countdown = document.createElement('obs-countdown');
+    countdown.setAttribute('date', date);
+    countdown.setAttribute('show', show);
+    countdown.setAttribute('text-color', textColor);
+    document.body.appendChild(countdown);
+</script>
+</body>
+</html>
