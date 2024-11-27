@@ -1,4 +1,4 @@
-const BaseCss = `
+export const BaseCss = `
             :host {
                 display: flex;
                 flex-direction: column;
@@ -33,7 +33,7 @@ export class CountdownUnit extends HTMLElement {
         this._unitEl = document.createElement('div');
         this._unitEl.classList.add('unit');
 
-        this._shadow = this.attachShadow({mode : 'closed' }) ;
+        this._shadow = this.attachShadow({mode: 'closed'});
         const css = document.createElement('style');
         css.textContent = BaseCss;
         this._shadow.appendChild(css);

@@ -1,3 +1,6 @@
+import {CodeCss} from '../common/css/code.css.js';
+import {extractUnitsFromAttribute} from '../common/units.js';
+
 const BaseCss = `
     :host {
         display: flex;
@@ -7,15 +10,9 @@ const BaseCss = `
         gap: 1rem;
     }
     
-   code {
-        background-color: #f8f8f8;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 90%;
-        margin: 0;
-        padding: .05rem .2rem;
-    }
+   ${CodeCss}
 `;
+
 
 class Countdown extends HTMLElement {
     _shadow;
@@ -59,9 +56,7 @@ class Countdown extends HTMLElement {
     }
 
     _updatePropertyShow(newValue) {
-        const units = newValue.split(/[\s;,]/).map(unit => unit.trim());
-        this._timeEls = ['days', 'hours', 'minutes', 'secondes']
-            .filter(unit => unit.length > 0 && units.includes(unit))
+        this._timeEls = extractUnitsFromAttribute(newValue)
             .map(unit => {
                 const el = document.createElement('obs-countdown-unit');
                 el.setAttribute('unit', unit);
@@ -75,7 +70,7 @@ class Countdown extends HTMLElement {
             .filter(node => node.nodeName !== 'STYLE')
             .forEach(el => el.remove());
 
-        if (isNaN(this._toDate.getTime())) {
+        if (!this._toDate || isNaN(this._toDate.getTime())) {
             const futureDate = new Date();
             futureDate.setTime(futureDate.getTime() + 2 * 60 * 60 * 1000);
             const el = document.createElement('p');

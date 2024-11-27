@@ -1,26 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" onclick="toggleRenderView()">
 <head>
     <meta charset="UTF-8">
     <title>It's the final countdown</title>
+    <script type="module" src="common/css/code.css.js"></script>
+    <script type="module" src="common/units.js"></script>
     <script type="module" src="components/countdown.component.js"></script>
     <script type="module" src="components/countdown-unit.component.js"></script>
+    <script type="module" src="components/configurator/color-picker.configurator.js"></script>
+    <script type="module" src="components/configurator/widget-url.configurator.js"></script>
+    <script type="module" src="components/configurator/configurator.component.js"></script>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=angkor:400" rel="stylesheet"/>
 
+    <style>
+        body {
+            font-family: 'Angkor', display;
+        }
+
+        body.is-render-view *:not(obs-configurator):not(.render-view) {
+            display: none;
+        }
+    </style>
 </head>
-<body>
+<body class="is-render-view">
+
+<obs-configurator></obs-configurator>
 
 <script type="text/javascript">
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const date = searchParams.get('date') ?? null;
-    const show = searchParams.get('show') ?? 'hours,secondes       minutes;days';
-    const textColor = searchParams.get('text-color') ?? '#000';
-
-    const countdown = document.createElement('obs-countdown');
-    countdown.setAttribute('date', date);
-    countdown.setAttribute('show', show);
-    countdown.setAttribute('text-color', textColor);
-    document.body.appendChild(countdown);
+    function toggleRenderView(force) {
+        if (document.body.classList.contains('is-render-view')) {
+            document.body.classList.remove('is-render-view');
+        } else if (force === true) {
+            document.body.classList.add('is-render-view');
+        }
+    }
 </script>
 </body>
 </html>
