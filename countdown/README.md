@@ -1,5 +1,12 @@
 # Countdown OBS timer
 
+## Repository
+https://github.com/mgohin/obs-widgets
+
+Free and open source, you can raise issues, provide pull requests or juste use it ;)
+
+## Online
+https://mgohin.github.io/obs-widgets/countdown/
 
 ## Query params
 
