@@ -1,5 +1,5 @@
 import {CodeCss} from '../common/css/code.css.js';
-import {extractUnitsFromAttribute} from '../common/units.js';
+import {extractUnitsFromAttribute, UnitConfigurationList} from '../common/units.js';
 
 const BaseCss = `
     :host {
@@ -31,15 +31,15 @@ class Countdown extends HTMLElement {
     }
 
     static get observedAttributes() {
-        return ['date', 'show', 'text-color'];
+        return ['date', 'units', 'text-color'];
     }
 
     attributeChangedCallback(property, oldValue, newValue) {
         if (oldValue === newValue) return;
         if (property === 'date') {
             this._updatePropertyDate(newValue);
-        } else if (property === 'show') {
-            this._updatePropertyShow(newValue);
+        } else if (property === 'units') {
+            this._updatePropertyUnits(newValue);
         } else if(property === 'text-color') {
             this._textColor = newValue;
             this._timeEls.forEach(el => el.setAttribute('text-color', newValue));
@@ -55,11 +55,13 @@ class Countdown extends HTMLElement {
         this._updateInterval();
     }
 
-    _updatePropertyShow(newValue) {
-        this._timeEls = extractUnitsFromAttribute(newValue)
-            .map(unit => {
+    _updatePropertyUnits(newValue) {
+        const unitConfigurations = UnitConfigurationList.fromAttribute(newValue);
+        this._timeEls = unitConfigurations
+            .filter(unitConfiguration => unitConfiguration.visible)
+            .map(unitConfiguration => {
                 const el = document.createElement('obs-countdown-unit');
-                el.setAttribute('unit', unit);
+                el.setAttribute('unit', unitConfiguration.toAttribute());
                 return el;
             });
         this._resetTimeElements();

@@ -1,3 +1,5 @@
+import {UnitConfiguration} from '../common/units.js';
+
 export const BaseCss = `
             :host {
                 display: flex;
@@ -21,7 +23,7 @@ export const BaseCss = `
 export class CountdownUnit extends HTMLElement {
 
     _shadow;
-    _unit;
+    _unitConfiguration;
     _remainingTimeInMs = 0;
     _timeEl;
     _unitEl;
@@ -49,8 +51,8 @@ export class CountdownUnit extends HTMLElement {
     attributeChangedCallback(property, oldValue, newValue) {
         if (oldValue === newValue) return;
         if (property === 'unit') {
-            this._unit = newValue;
-            this._unitEl.textContent = newValue.substr(0, 1).toUpperCase();
+            this._unitConfiguration = UnitConfiguration.fromAttribute(newValue);
+            this._unitEl.textContent = this._unitConfiguration.name;
         } else if (property === 'remaining-time-in-ms') {
             this._remainingTimeInMs = Number(newValue);
             this._updateView();
@@ -60,10 +62,11 @@ export class CountdownUnit extends HTMLElement {
     }
 
     _updateView() {
-        const totalSecondes = this._remainingTimeInMs / 1000;
-        const divisor = this._unit === 'secondes' ? 1 : this._unit === 'minutes' ? 60 : this._unit === 'hours' ? 60 * 60 : 60 * 60 * 24;
-        const modulo = this._unit === 'secondes' ? 60 : this._unit === 'minutes' ? 60 : this._unit === 'hours' ? 24 : 1;
-        const value = Math.floor(totalSecondes / divisor) % modulo;
+        const totalSeconds = this._remainingTimeInMs / 1000;
+        // TODO export ces calculs dans la classe UnitConfiguration avec une sous classe par type d'unité
+        const divisor = this._unitConfiguration.unit === 'seconds' ? 1 : this._unitConfiguration.unit === 'minutes' ? 60 : this._unitConfiguration.unit === 'hours' ? 60 * 60 : 60 * 60 * 24;
+        const modulo = this._unitConfiguration.unit === 'seconds' ? 60 : this._unitConfiguration.unit === 'minutes' ? 60 : this._unitConfiguration.unit === 'hours' ? 24 : 1;
+        const value = Math.floor(totalSeconds / divisor) % modulo;
         this._timeEl.textContent = `${value < 10 ? '0' : ''}${value}`;
     }
 }

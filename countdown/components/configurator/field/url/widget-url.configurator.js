@@ -1,11 +1,11 @@
-import {getUnits} from '../../common/units.js';
+import {getDefaultUnits, getUnitKeys, UnitConfigurationList} from '../../../../common/units.js';
 
 const BaseCss = `
     .url-date {
         color: red;
     }
     
-    .url-show {
+    .url-units {
         color: green;
     }
     
@@ -21,7 +21,7 @@ export class WidgetUrlConfigurator extends HTMLElement {
     _data = {
         date: null,
         textColor: null,
-        show: getUnits()
+        units: getDefaultUnits()
     };
 
     constructor() {
@@ -36,7 +36,7 @@ export class WidgetUrlConfigurator extends HTMLElement {
     }
 
     static get observedAttributes() {
-        return ['text-color', 'show', 'date'];
+        return ['text-color', 'units', 'date'];
     }
 
     _createUrlEl() {
@@ -47,6 +47,8 @@ export class WidgetUrlConfigurator extends HTMLElement {
         if (oldValue === newValue) return;
         if(property === 'text-color') {
             this._data.textColor = newValue;
+        } else if(property === 'units') {
+            this._data.units = UnitConfigurationList.fromAttribute(newValue)
         } else {
             this._data[property] = newValue;
         }
@@ -57,7 +59,7 @@ export class WidgetUrlConfigurator extends HTMLElement {
         const params = [
             `<span class="url-date">date=${this._data.date}</span>`,
             `<span class="url-text-color">text-color=${this._data.textColor}</span>`,
-            `<span class="url-show">show=${this._data.show}</span>`
+            `<span class="url-units">units=${this._data.units.toAttribute()}</span>`
         ].join('&');
         const newUrl = `${window.location.origin}${window.location.pathname}?${params}`;
         if (newUrl === this._urlEl) return;

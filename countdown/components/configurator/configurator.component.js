@@ -1,3 +1,5 @@
+import {getDefaultUnits} from '../../common/units.js';
+
 class Configurator extends HTMLElement {
 
     _countdownEl;
@@ -6,74 +8,62 @@ class Configurator extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-           <section>
-                <h1>Configurator <button onclick="event.stopPropagation(); toggleRenderView(true)">Close</button></h1>
-                <p>Use this form to configure your widget url</p>
-            </section>
-            <section class="render-view">
+            <div class="render-view">
                 <obs-countdown id="countdown" class="render-view"></obs-countdown>
-            </section>
-            <section>
-                <h2>Widget url</h2>
+            </div>
+           <fieldset>
+                <legend>Configurator <button onclick="event.stopPropagation(); toggleRenderView(true)">Close</button></legend>
+               <p>Use this form to configure your widget url</p>
+            </fieldset>
+            <fieldset>
+                <legend>Widget url</legend>
                 <obs-countdown-configurator-widget-url id="widget-url"></obs-countdown-configurator-widget-url>
-            </section>
-            <section id="color-picker">
-
-            </section>
+            </fieldset>
+            <fieldset>
+                <legend>Select units you want to see</legend>
+                <obs-countdown-configurator-units></obs-countdown-configurator-units>
+            </fieldset>
         `;
         this._countdownEl = document.getElementById('countdown');
-        this._initWidgetUrl();
-        this._initCountdown();
-        this._initColorPicker();
+        const conf = this._extractUrlParamsOrDefaultValues();
+        this._initWidgetUrl(conf);
+        this._initUnitsConfigurator(conf.units);
     }
 
-    _initWidgetUrl() {
+    _extractUrlParamsOrDefaultValues() {
+        const searchParams = new URLSearchParams(window.location.search);
+        const date = searchParams.get('date') ?? null;
+        const units = /*extractUnitsFromAttribute(searchParams.get('units')) ?? */getDefaultUnits();
+        const textColor = searchParams.get('text-color') ?? '#000';
+        return {date, units, textColor};
+    }
+
+    _initWidgetUrl(conf) {
         this._widgetUrlEl = document.getElementById('widget-url');
         this._widgetUrlEl.addEventListener('change', ev => {
             this._updateCountdown(ev.detail.data);
         });
-    }
 
-    _initCountdown() {
-        const searchParams = new URLSearchParams(window.location.search);
-        const date = searchParams.get('date') ?? null;
-        const show = searchParams.get('show') ?? 'hours,secondes       minutes;days';
-        const textColor = searchParams.get('text-color') ?? '#000';
-
-        if (date !== null) {
-            this._widgetUrlEl.setAttribute('date', date);
+        if (conf.date !== null) {
+            this._widgetUrlEl.setAttribute('date', conf.date);
         }
 
-        this._widgetUrlEl.setAttribute('show', show);
-        this._widgetUrlEl.setAttribute('text-color', textColor);
+        // this._widgetUrlEl.setAttribute('units', conf.units);
+        // this._widgetUrlEl.setAttribute('text-color', conf.textColor);
     }
 
     _updateCountdown(data) {
-        if (data.date === null) {
-            this._countdownEl.removeAttribute('date');
-        } else {
-            this._countdownEl.setAttribute('date', data.date);
-        }
-        if (data.show === null) {
-            this._countdownEl.removeAttribute('show');
-        } else {
-            this._countdownEl.setAttribute('show', data.show);
-        }
-        if (data.textColor === null) {
-            this._countdownEl.removeAttribute('text-color');
-        } else {
-            this._countdownEl.setAttribute('text-color', data.textColor);
-        }
+        this._countdownEl.setAttribute('date', data.date);
+        this._countdownEl.setAttribute('units', data.units.toAttribute());
+        this._countdownEl.setAttribute('text-color', data.textColor);
     }
 
-    _initColorPicker() {
-        const colorPickerEl = document.createElement('obs-countdown-configurator-color-picker');
-        colorPickerEl.setAttribute('color', '#CE3B3B');
-        colorPickerEl.addEventListener('change', ev => {
-            this._widgetUrlEl.setAttribute('text-color', ev.detail.color);
+    _initUnitsConfigurator(checkedUnits) {
+        const configuratorUnitsEl = this.getElementsByTagName('obs-countdown-configurator-units')[0];
+        configuratorUnitsEl.addEventListener('change', ev => {
+            this._widgetUrlEl.setAttribute('units', ev.detail.activeUnits.toAttribute());
         });
-        document.getElementById('color-picker')
-            .appendChild(colorPickerEl);
+        configuratorUnitsEl.setAttribute('checked-units', checkedUnits.toAttribute());
     }
 }
 
