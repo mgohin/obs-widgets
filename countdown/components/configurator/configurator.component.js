@@ -1,4 +1,4 @@
-import {getDefaultUnits} from '../../common/units.js';
+import {parseUnitsOrGetDefaults} from '../../common/units.js';
 
 class Configurator extends HTMLElement {
 
@@ -33,9 +33,8 @@ class Configurator extends HTMLElement {
     _extractUrlParamsOrDefaultValues() {
         const searchParams = new URLSearchParams(window.location.search);
         const date = searchParams.get('date') ?? null;
-        const units = /*extractUnitsFromAttribute(searchParams.get('units')) ?? */getDefaultUnits();
-        const textColor = searchParams.get('text-color') ?? '#000';
-        return {date, units, textColor};
+        const units = parseUnitsOrGetDefaults(searchParams.get('units'));
+        return {date, units};
     }
 
     _initWidgetUrl(conf) {
@@ -47,23 +46,19 @@ class Configurator extends HTMLElement {
         if (conf.date !== null) {
             this._widgetUrlEl.setAttribute('date', conf.date);
         }
-
-        // this._widgetUrlEl.setAttribute('units', conf.units);
-        // this._widgetUrlEl.setAttribute('text-color', conf.textColor);
     }
 
     _updateCountdown(data) {
         this._countdownEl.setAttribute('date', data.date);
         this._countdownEl.setAttribute('units', data.units.toAttribute());
-        this._countdownEl.setAttribute('text-color', data.textColor);
     }
 
-    _initUnitsConfigurator(checkedUnits) {
+    _initUnitsConfigurator(units) {
         const configuratorUnitsEl = this.getElementsByTagName('obs-countdown-configurator-units')[0];
         configuratorUnitsEl.addEventListener('change', ev => {
             this._widgetUrlEl.setAttribute('units', ev.detail.activeUnits.toAttribute());
         });
-        configuratorUnitsEl.setAttribute('checked-units', checkedUnits.toAttribute());
+        configuratorUnitsEl.setAttribute('units', units.toAttribute());
     }
 }
 

@@ -1,4 +1,4 @@
-import {UnitConfiguration} from '../common/units.js';
+import {UnitConfiguration} from '../common/model/unit-configuration.model.js';
 
 export const BaseCss = `
             :host {
@@ -52,7 +52,9 @@ export class CountdownUnit extends HTMLElement {
         if (oldValue === newValue) return;
         if (property === 'unit') {
             this._unitConfiguration = UnitConfiguration.fromAttribute(newValue);
+            this._timeEl.style.color = this._unitConfiguration.timeColor;
             this._unitEl.textContent = this._unitConfiguration.name;
+            this._unitEl.style.color = this._unitConfiguration.unitColor;
         } else if (property === 'remaining-time-in-ms') {
             this._remainingTimeInMs = Number(newValue);
             this._updateView();

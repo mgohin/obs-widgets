@@ -1,12 +1,10 @@
 import {CodeCss} from '../common/css/code.css.js';
-import {extractUnitsFromAttribute, UnitConfigurationList} from '../common/units.js';
+import {UnitConfigurationList} from '../common/model/unit-configuration.model.js';
 
 const BaseCss = `
     :host {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
+        display: inline-grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
         gap: 1rem;
     }
     

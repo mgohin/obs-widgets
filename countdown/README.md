@@ -18,3 +18,9 @@ https://mgohin.github.io/obs-widgets/countdown/
 
 
 Exemple: `...&date=2024-11-27T00:49:20.354Z&text-color=red&units=minutes,seconds`
+
+## TODO
+
+- ajouter le datepicker
+- sélectionner la font
+- proposer des palettes de couleurs

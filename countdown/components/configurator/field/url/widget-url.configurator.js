@@ -1,4 +1,5 @@
-import {getDefaultUnits, getUnitKeys, UnitConfigurationList} from '../../../../common/units.js';
+import {getDefaultUnits} from '../../../../common/units.js';
+import {UnitConfigurationList} from '../../../../common/model/unit-configuration.model.js';
 
 const BaseCss = `
     .url-date {
@@ -7,10 +8,6 @@ const BaseCss = `
     
     .url-units {
         color: green;
-    }
-    
-    .url-text-color {
-        color: blue;
     }
 `;
 
@@ -36,7 +33,7 @@ export class WidgetUrlConfigurator extends HTMLElement {
     }
 
     static get observedAttributes() {
-        return ['text-color', 'units', 'date'];
+        return ['units', 'date'];
     }
 
     _createUrlEl() {
@@ -45,10 +42,8 @@ export class WidgetUrlConfigurator extends HTMLElement {
 
     attributeChangedCallback(property, oldValue, newValue) {
         if (oldValue === newValue) return;
-        if(property === 'text-color') {
-            this._data.textColor = newValue;
-        } else if(property === 'units') {
-            this._data.units = UnitConfigurationList.fromAttribute(newValue)
+        if (property === 'units') {
+            this._data.units = UnitConfigurationList.fromAttribute(newValue);
         } else {
             this._data[property] = newValue;
         }
@@ -57,15 +52,22 @@ export class WidgetUrlConfigurator extends HTMLElement {
 
     _updateUrl() {
         const params = [
-            `<span class="url-date">date=${this._data.date}</span>`,
-            `<span class="url-text-color">text-color=${this._data.textColor}</span>`,
-            `<span class="url-units">units=${this._data.units.toAttribute()}</span>`
-        ].join('&');
-        const newUrl = `${window.location.origin}${window.location.pathname}?${params}`;
+            {key: 'date', value: this._data.date},
+            {key: 'units', value: this._data.units.toAttribute()}
+        ];
+        const visibleUrlParams = params
+            .map(param => `<span class="url-${param.key}">${param.key}=${encodeURIComponent(param.value)}</span>`)
+            .join('&');
+
+        const newUrl = `${window.location.origin}${window.location.pathname}?${visibleUrlParams}`;
         if (newUrl === this._urlEl) return;
 
         this._url = newUrl;
         this._urlEl.innerHTML = this._url;
+
+        const searchParams = new URLSearchParams(window.location.search);
+        params.forEach(param => searchParams.set(param.key, param.value));
+        window.history.replaceState(null, null, '?' + searchParams.toString());
         this.dispatchEvent(new CustomEvent('change', {detail: {data: this._data}}));
     }
 }

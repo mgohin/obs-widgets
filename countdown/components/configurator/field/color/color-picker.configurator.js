@@ -27,7 +27,7 @@ export class ColorPickerConfigurator extends HTMLElement {
         if (oldValue === newValue) return;
 
         if (property === 'color') {
-            this._colorInputEl.setAttribute('value', newValue ?? '#000');
+            this._colorInputEl.value = newValue ?? '#000';
         }
     }
 }
